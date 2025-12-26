@@ -1,0 +1,20 @@
+{% extends "blog/base.html" %}
+{% block title %}글 목록 - 나만의 블로그{% endblock %}
+
+{% block content %}
+    <h1 class="content-title">글 목록</h1>
+
+    {% for post in posts %}
+        <div class="post-item">
+            <h2 class="post-title">{{ post.title }}</h2>
+            <p class="post-meta">{{ post.created_at|date:"Y년 n월 j일" }}</p>
+            <div class="post-content">
+                {{ post.content|linebreaksbr }}
+            </div>
+        </div>
+    {% empty %}
+        <div class="no-posts">
+            <p>아직 작성된 글이 없습니다.</p>
+        </div>
+    {% endfor %}
+{% endblock %}

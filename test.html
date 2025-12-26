@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>웹페이지 예제</title>
+    
+</head>
+<body>
+
+    <table width="100%" border="0" cellpadding="10" cellspacing="0">
+        <!-- 헤더 섹션 -->
+        <tr id="page-header" bgcolor="#4a69bd">
+            <td align="center">
+                <font color="white">
+                    <h1>집가고싶다</h1>
+                    <p>나다</p>
+                </font>
+            </td>
+        </tr>
+        
+        <!-- 네비게이션 섹션 -->
+        <tr bgcolor="#3b528f">
+            <td align="center">
+                <font color="white">
+                    <a href="#home"><font color="white">홈</font></a>
+                    &nbsp;&nbsp;|&nbsp;&nbsp;
+                    <a href="#about"><font color="white">소개</font></a>
+                    &nbsp;&nbsp;|&nbsp;&nbsp;
+                    <a href="#contact"><font color="white">연락처</font></a>
+                </font>
+            </td>
+        </tr>
+
+        <!-- 메인 콘텐츠 섹션 -->
+        <tr>
+            <td align="center" bgcolor="#f4f4f9">
+                <br>
+                <table width="960" border="0" cellpadding="20" cellspacing="0" bgcolor="white">
+                    <!-- 이미지 -->
+                    <tr>
+                        <td align="center">
+                            <img src="https://picsum.photos/seed/gemini/900/400" alt="랜덤 자연 풍경 이미지" width="900">
+                        </td>
+                    </tr>
+                    <!-- 소개 글 -->
+                    <tr id="about">
+                        <td>
+                            <h2>페이지 소개</h2>
+                            <p>gemini에게 맞겨서 만들어진 사이트이며, 스타일링은 태그의 'bgcolor', 'width', 'align' 같은 속성을 이용합니다.</p>
+                            <p>css 기능을 빼고 만들었다</p>
+                        </td>
+                    </tr>
+                    <!-- 인터랙티브 존 -->
+                    <tr>
+                        <td align="center" bgcolor="#eef2f7">
+                            <h2>헤더 색상 변경하기</h2>
+                            <p>아래 버튼을 눌러 페이지 상단 헤더의 색을 바꿔보세요!</p>
+                            <button id="color-change-btn">색상 변경!</button>
+                        </td>
+                    </tr>
+                </table>
+                <br>
+            </td>
+        </tr>
+
+        <!-- 푸터 섹션 -->
+        <tr>
+            <td align="center">
+                <hr>
+                <font color="#777" size="2">&copy; 2025 nada. All Rights Reserved.</font>
+            </td>
+        </tr>
+    </table>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const colorChangeBtn = document.getElementById('color-change-btn');
+            const headerRow = document.getElementById('page-header');
+            
+            const colors = ['#e74c3c', '#8e44ad', '#27ae60', '#f39c12', '#2980b9'];
+            let currentColorIndex = 0;
+
+            colorChangeBtn.addEventListener('click', () => {
+                currentColorIndex = (currentColorIndex + 1) % colors.length;
+                // bgcolor 속성을 직접 변경합니다.
+                headerRow.bgColor = colors[currentColorIndex];
+                
+                alert('헤더 색상이 ' + colors[currentColorIndex] + '으로 변경되었습니다!');
+            });
+        });
+    </script>
+
+</body>
+</html>
