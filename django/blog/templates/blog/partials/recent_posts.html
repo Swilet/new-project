@@ -1,0 +1,12 @@
+<div class="list-group list-group-flush">
+  {% for post in recent_posts %}
+    <a href="{% url 'blog:post_detail' post.pk %}" class="list-group-item list-group-item-action">
+      <div class="fw-semibold text-truncate">{{ post.title }}</div>
+      <div class="text-secondary small text-truncate-2">{{ post.content|striptags|truncatewords:10 }}</div>
+    </a>
+  {% empty %}
+    <div class="list-group-item">
+      <p class="mb-0 text-secondary">아직 작성된 글이 없습니다.</p>
+    </div>
+  {% endfor %}
+</div>

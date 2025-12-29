@@ -1,20 +1,118 @@
 {% extends "blog/base.html" %}
-{% block title %}글 목록 - 나만의 블로그{% endblock %}
+{% block title %}
+  {% if search_query %}
+    '{{ search_query }}' 검색 결과
+  {% elif category %}
+    {{ category.name }} - 글 목록
+  {% elif tag %}
+    '{{ tag.name }}' 태그 글 목록
+  {% else %}
+    전체 글 목록
+  {% endif %}
+{% endblock %}
 
 {% block content %}
-    <h1 class="content-title">글 목록</h1>
+  {% if search_query %}
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <h5 class="card-title mb-0">
+          <i class="bi bi-search"></i>
+          '{{ search_query }}'에 대한 검색 결과 ({{ posts.paginator.count }}개)
+        </h5>
+      </div>
+    </div>
+  {% elif category %}
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <h5 class="card-title mb-0">
+          <i class="bi bi-folder"></i>
+          카테고리: <strong>{{ category.name }}</strong> ({{ posts.paginator.count }}개)
+        </h5>
+      </div>
+    </div>
+  {% elif tag %}
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title mb-0">
+                <i class="bi bi-tag"></i>
+                태그: <strong>{{ tag.name }}</strong> ({{ posts.paginator.count }}개)
+            </h5>
+        </div>
+    </div>
+  {% else %}
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+          <h5 class="card-title mb-0">
+              <i class="bi bi-collection"></i>
+              전체 글 목록 ({{ posts.paginator.count }}개)
+          </h5>
+      </div>
+    </div>
+  {% endif %}
 
     {% for post in posts %}
-        <div class="post-item">
-            <h2 class="post-title">{{ post.title }}</h2>
-            <p class="post-meta">{{ post.created_at|date:"Y년 n월 j일" }}</p>
-            <div class="post-content">
-                {{ post.content|linebreaksbr }}
+        <div class="card shadow-sm hover-lift mb-3 position-relative">
+          <div class="card-body">
+            <h2 class="card-title h5 mb-1">{{ post.title }}</h2>
+            <p class="card-subtitle text-secondary small mb-2">{{ post.created_at|date:"Y년 n월 j일" }}</p>
+            <div class="card-text text-secondary text-truncate-2">
+                {{ post.content|striptags }}
             </div>
+            <a href="{% url 'blog:post_detail' post.pk %}" class="stretched-link"></a>
+
+            <div class="mt-3 d-flex flex-wrap gap-2">
+              {% for cat in post.categories.all %}
+                <a href="{% url 'blog:posts_by_category' cat.name %}" class="badge text-bg-light text-decoration-none position-relative" style="z-index: 1;">{{ cat.name }}</a>
+              {% endfor %}
+              {% for tag in post.tags.all %}
+                <a href="{% url 'blog:posts_by_tag' tag.name %}" class="badge text-bg-primary text-decoration-none position-relative" style="z-index: 1;">{{ tag.name }}</a>
+              {% endfor %}
+            </div>
+          </div>
         </div>
     {% empty %}
-        <div class="no-posts">
-            <p>아직 작성된 글이 없습니다.</p>
-        </div>
+      <div class="alert alert-warning">
+        {% if search_query %}
+          <p class="mb-0">'{{ search_query }}'에 대한 검색 결과가 없습니다.</p>
+        {% elif category %}
+            <p class="mb-0">'{{ category.name }}' 카테고리에 아직 글이 없습니다.</p>
+        {% elif tag %}
+            <p class="mb-0">'{{ tag.name }}' 태그에 아직 글이 없습니다.</p>
+        {% else %}
+          <p class="mb-0">아직 작성된 글이 없습니다.</p>
+        {% endif %}
+      </div>
     {% endfor %}
+
+    {% if posts.has_other_pages %}
+    <nav aria-label="Page navigation" class="d-flex justify-content-center mt-4">
+      <ul class="pagination shadow-sm">
+        {% if posts.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ posts.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if category %}&category={{ category.name }}{% endif %}{% if tag %}&tag={{ tag.name }}{% endif %}">&laquo; 이전</a>
+          </li>
+        {% else %}
+          <li class="page-item disabled">
+            <span class="page-link">&laquo; 이전</span>
+          </li>
+        {% endif %}
+
+        <li class="page-item active" aria-current="page">
+          <span class="page-link">
+            {{ posts.number }} / {{ posts.paginator.num_pages }}
+          </span>
+        </li>
+
+        {% if posts.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ posts.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if category %}&category={{ category.name }}{% endif %}{% if tag %}&tag={{ tag.name }}{% endif %}">다음 &raquo;</a>
+          </li>
+        {% else %}
+          <li class="page-item disabled">
+            <span class="page-link">다음 &raquo;</span>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+  {% endif %}
 {% endblock %}
