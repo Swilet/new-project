@@ -1,0 +1,27 @@
+{% extends "blog/base.html" %}
+
+{% block title %}{{ travel.name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-lg-8 offset-lg-2">
+      <div class="card nm-card">
+        <div class="card-body">
+          <h1 class="card-title h2">{{ travel.name }}</h1>
+          <p class="card-text text-muted">{{ travel.created_at|date:"Y년 n월 j일" }}</p>
+          <hr>
+          <div class="card-text mb-4">
+            {{ travel.description|safe }}
+          </div>
+        </div>
+        <div class="card-footer text-end">
+          <a href="{% url 'travel:travel_list' %}" class="btn btn-outline-primary">
+            <i class="bi bi-list"></i> 목록으로
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

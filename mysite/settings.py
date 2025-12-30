@@ -41,6 +41,9 @@ INSTALLED_APPS = [
     'blog',
     'pages',  # TH added
     'notes.apps.NotesConfig',
+    'travel.apps.TravelConfig',
+    'ckeditor',
+    'ckeditor_uploader',
 ]
 
 MIDDLEWARE = [
@@ -135,7 +138,13 @@ STATIC_URL = 'static/'
 # [수정 3] 정적 파일을 모으기 위한 경로 설정 추가
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+# Media files
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CKEDITOR_UPLOAD_PATH = "uploads/"
