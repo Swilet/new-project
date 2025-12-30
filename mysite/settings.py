@@ -25,7 +25,8 @@ SECRET_KEY = 'django-insecure-7ua6%=eanwsqgbepc9e(asev1)a5e4@xbe2b@3-#az2n9+9e^3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# [수정 1] 배포 환경에서 접속을 허용하기 위해 '*' 추가
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -44,6 +45,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    # [수정 2] Whitenoise 미들웨어 추가 (정적 파일 처리용)
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -128,6 +131,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# [수정 3] 정적 파일을 모으기 위한 경로 설정 추가
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
