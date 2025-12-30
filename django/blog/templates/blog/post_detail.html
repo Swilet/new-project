@@ -3,12 +3,21 @@
 {% block title %}{{ post.title }}{% endblock %}
 
 {% block content %}
-  <div class="card shadow-sm">
-    <div class="card-body">
-      <h1 class="card-title h2">{{ post.title }}</h1>
-      <p class="card-subtitle text-secondary small mb-3">
-        {{ post.created_at|date:"Y년 n월 j일" }}
-      </p>
+  <div class="nm-card mb-4">
+    <div class="d-flex justify-content-between align-items-start">
+        <div>
+            <h1 class="h2 mb-1">{{ post.title }}</h1>
+            <p class="small text-secondary mb-3">
+                {{ post.created_at|date:"Y년 n월 j일" }}
+            </p>
+        </div>
+        <form action="{% url 'blog:like_post' post.pk %}" method="post" class="ms-3">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">
+                <i class="bi {% if user.is_authenticated and user in post.likes.all %}bi-heart-fill{% else %}bi-heart{% endif %}"></i> 좋아요 ({{ post.total_likes }})
+            </button>
+        </form>
+    </div>
       <div class="d-flex flex-wrap gap-2 mb-4">
         {% for cat in post.categories.all %}
           <a href="{% url 'blog:posts_by_category' cat.name %}" class="badge text-bg-light text-decoration-none">{{ cat.name }}</a>
@@ -17,67 +26,65 @@
           <a href="{% url 'blog:posts_by_tag' tag.name %}" class="badge text-bg-primary text-decoration-none">{{ tag.name }}</a>
         {% endfor %}
       </div>
-      <div class="card-text">
+      <div>
         {{ post.content|linebreaks }}
       </div>
-    </div>
-    <div class="card-footer d-flex justify-content-end align-items-center gap-2">
-        <form action="{% url 'blog:like_post' post.pk %}" method="post">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger">
-                <i class="bi bi-heart-fill"></i> 좋아요 ({{ post.likes }})
-            </button>
-        </form>
+      <hr class="my-4">
+      <div class="text-end">
         <a href="{% url 'blog:post_list' %}" class="btn btn-outline-primary">
             <i class="bi bi-list"></i> 목록으로
         </a>
     </div>
   </div>
 
-  <hr class="my-4">
-
   <!-- Comments section -->
-  <div class="card shadow-sm mt-4">
-    <div class="card-body">
-      <h4 class="card-title">({{ comments.count }}) 댓글</h4>
+  <div class="nm-card mb-4">
+      <h4 class="mb-3">({{ comments.count }}) 댓글</h4>
       {% for comment in comments %}
-        <div class="d-flex gap-3 py-3 border-bottom">
-            <div class="rounded-circle bg-secondary-subtle d-flex align-items-center justify-content-center" style="width:40px;height:40px;">
+        <div class="d-flex gap-3 py-3 {% if not forloop.last %}border-bottom{% endif %}">
+            <div class="rounded-circle bg-secondary-subtle d-flex align-items-center justify-content-center flex-shrink-0" style="width:40px;height:40px;">
                 <i class="bi bi-person-fill text-secondary fs-5"></i>
             </div>
-            <div>
-                <div class="mb-1">
-                    <span class="fw-bold">{{ comment.author }}</span>
-                    <span class="text-secondary small ms-2">{{ comment.created_on|date:"Y.m.d H:i" }}</span>
+            <div class="w-100">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <span class="fw-bold">{{ comment.author }}</span>
+                        <span class="text-secondary small ms-2">{{ comment.created_on|date:"Y.m.d H:i" }}</span>
+                    </div>
+                    {% if user.username == comment.author %}
+                    <form action="{% url 'blog:delete_comment' post.pk comment.pk %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('정말 삭제하시겠습니까?');" title="삭제">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
+                    {% endif %}
                 </div>
-                <p class="mb-0 text-secondary">{{ comment.body|linebreaksbr }}</p>
+                <p class="mb-0 mt-1 text-secondary">{{ comment.body|linebreaksbr }}</p>
             </div>
         </div>
       {% empty %}
         <p class="text-secondary my-3">아직 댓글이 없습니다.</p>
       {% endfor %}
-    </div>
   </div>
 
   <!-- Comment form -->
-  <div class="card shadow-sm mt-4">
-    <div class="card-body">
-      <h5 class="card-title">댓글 남기기</h5>
+  <div class="nm-card">
+    <h5 class="mb-3">댓글 남기기</h5>
+    {% if user.is_authenticated %}
       <form method="post">
         {% csrf_token %}
         <div class="mb-3">
-          <label for="id_author" class="form-label">이름</label>
-          {{ comment_form.author.errors }}
-          <input type="text" name="author" class="form-control" id="id_author" required>
-        </div>
-        <div class="mb-3">
-          <label for="id_body" class="form-label">내용</label>
-          {{ comment_form.body.errors }}
-          <textarea name="body" class="form-control" id="id_body" rows="3" required></textarea>
+            <label for="{{ comment_form.body.id_for_label }}" class="form-label">내용</label>
+            {{ comment_form.body.errors }}
+            <textarea name="{{ comment_form.body.name }}" id="{{ comment_form.body.id_for_label }}" class="form-control" rows="3" required>{{ comment_form.body.value|default_if_none:'' }}</textarea>
         </div>
         <button type="submit" class="btn btn-primary">댓글 달기</button>
       </form>
-    </div>
+    {% else %}
+      <div class="alert alert-secondary">
+        댓글을 작성하려면 <a href="/admin/login/?next={{ request.path }}">로그인</a>이 필요합니다.
+      </div>
+    {% endif %}
   </div>
 {% endblock %}
-

@@ -3,6 +3,8 @@ from django.db.models import Q
 from .models import Post, Category, Comment, Tag
 from .forms import CommentForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 
 def post_list(request, category_name=None, tag_name=None):
     search_query = request.GET.get('q', '')
@@ -42,6 +44,7 @@ def post_list(request, category_name=None, tag_name=None):
         "search_query": search_query,
     })
 
+@login_required
 def post_detail(request, pk):
     post = get_object_or_404(Post.objects.prefetch_related('categories', 'tags', 'comments'), pk=pk)
     comments = post.comments.filter(active=True)
@@ -52,6 +55,7 @@ def post_detail(request, pk):
         if comment_form.is_valid():
             new_comment = comment_form.save(commit=False)
             new_comment.post = post
+            new_comment.author = request.user.username 
             new_comment.save()
             return redirect(post.get_absolute_url())
     else:
@@ -64,9 +68,20 @@ def post_detail(request, pk):
         'comment_form': comment_form
     })
 
+@require_POST
+@login_required
+def delete_comment(request, post_pk, pk):
+    comment = get_object_or_404(Comment, pk=pk)
+    if request.user.username == comment.author:
+        comment.delete()
+    return redirect('blog:post_detail', pk=post_pk)
+
+@login_required
+@require_POST
 def like_post(request, pk):
-    if request.method == 'POST':
-        post = get_object_or_404(Post, id=pk)
-        post.likes += 1
-        post.save()
+    post = get_object_or_404(Post, id=pk)
+    if request.user in post.likes.all():
+        post.likes.remove(request.user)
+    else:
+        post.likes.add(request.user)
     return redirect(post.get_absolute_url())

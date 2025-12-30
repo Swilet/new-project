@@ -2,30 +2,29 @@
 {% block title %}Contact - Dep & Arr{% endblock %}
 
 {% block content %}
-  <div class="card shadow-sm">
-    <div class="card-header">
-      <h5 class="mb-0"><i class="bi bi-chat-dots"></i> Contact</h5>
+  <div class="nm-card">
+    <h5 class="mb-3"><i class="bi bi-chat-dots"></i> Contact</h5>
+    <p class="text-secondary">
+      블로그에 대한 문의나 피드백은 아래로 연락해 주세요.
+    </p>
+
+    <div class="mt-4">
+      <div class="mb-3">
+        <strong><i class="bi bi-envelope"></i> Email:</strong>
+        <a href="mailto:com060310@gmail.com">com060310@gmail.com</a>
+      </div>
+      <div>
+        <strong><i class="bi bi-github"></i> GitHub:</strong>
+        <a href="https://github.com/Swilet/" target="_blank" rel="noopener noreferrer">https://github.com/Swilet/</a>
+      </div>
     </div>
-    <div class="card-body">
-      <p class="card-text text-secondary">
-        블로그에 대한 문의나 피드백은 아래로 연락해 주세요.
-      </p>
-      <ul class="list-group list-group-flush">
-        <li class="list-group-item">
-          <strong><i class="bi bi-envelope"></i> Email:</strong>
-          <a href="mailto:com060310@gmail.com">com060310@gmail.com</a>
-        </li>
-        <li class="list-group-item">
-          <strong><i class="bi bi-github"></i> GitHub:</strong>
-          <a href="https://github.com/Swilet/" target="_blank" rel="noopener noreferrer">https://github.com/Swilet/</a>
-        </li>
-      </ul>
-    </div>
-    <div class="card-footer text-end">
+
+    <hr class="my-4">
+
+    <div class="text-end">
       <a class="btn btn-primary" href="{% url 'blog:post_list' %}">
         <i class="bi bi-house"></i> Home
       </a>
     </div>
   </div>
 {% endblock %}
-
