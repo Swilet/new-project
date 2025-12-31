@@ -1,5 +1,5 @@
 {% extends "blog/base.html" %}
-
+<h1>여기가 진짜 내 파일 맞냐!!!</h1> <div class="nm-card mb-4"></div>
 {% block title %}{{ post.title }}{% endblock %}
 
 {% block content %}
@@ -14,7 +14,7 @@
         <form action="{% url 'blog:like_post' post.pk %}" method="post" class="ms-3">
             {% csrf_token %}
             <button type="submit" class="btn btn-danger">
-                <i class="bi {% if user.is_authenticated and user in post.likes.all %}bi-heart-fill{% else %}bi-heart{% endif %}"></i> 좋아요 ({{ post.total_likes }})
+                <i class="bi {% if is_liked %}bi-heart-fill{% else %}bi-heart{% endif %}"></i> 좋아요 ({{ post.total_likes }})
             </button>
         </form>
     </div>
@@ -71,20 +71,23 @@
   <!-- Comment form -->
   <div class="nm-card">
     <h5 class="mb-3">댓글 남기기</h5>
-    {% if user.is_authenticated %}
-      <form method="post">
-        {% csrf_token %}
-        <div class="mb-3">
-            <label for="{{ comment_form.body.id_for_label }}" class="form-label">내용</label>
-            {{ comment_form.body.errors }}
-            <textarea name="{{ comment_form.body.name }}" id="{{ comment_form.body.id_for_label }}" class="form-control" rows="3" required>{{ comment_form.body.value|default_if_none:'' }}</textarea>
-        </div>
-        <button type="submit" class="btn btn-primary">댓글 달기</button>
-      </form>
-    {% else %}
-      <div class="alert alert-secondary">
-        댓글을 작성하려면 <a href="/admin/login/?next={{ request.path }}">로그인</a>이 필요합니다.
-      </div>
+  
+    <form method="post">
+      {% csrf_token %}
+
+    {% if not user.is_authenticated %}
+    <div class="mb-3">
+        <label for="author" class="form-label">이름</label>
+        <input type="text" name="author" id="author" class="form-control" required>
+    </div>
     {% endif %}
-  </div>
+
+    <div class="mb-3">
+        <label for="{{ comment_form.body.id_for_label }}" class="form-label">내용</label>
+        {{ comment_form.body }}
+    </div>
+
+    <button type="submit" class="btn btn-primary">댓글 달기</button>
+  </form>
+</div>
 {% endblock %}

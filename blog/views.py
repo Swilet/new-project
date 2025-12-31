@@ -64,17 +64,33 @@ def post_detail(request, pk):
         if comment_form.is_valid():
             new_comment = comment_form.save(commit=False)
             new_comment.post = post
-            new_comment.author = request.user.username 
+            if request.user.is_authenticated:
+                new_comment.author = request.user.username
+            else:
+                author_name = request.POST.get('author')
+                if not author_name:
+                    # You might want to handle this error more gracefully
+                    return redirect(post.get_absolute_url())
+                new_comment.author = author_name
             new_comment.save()
             return redirect(post.get_absolute_url())
     else:
         comment_form = CommentForm()
 
+    is_liked = False
+    if request.user.is_authenticated:
+        if post.likes.filter(id=request.user.id).exists():
+            is_liked = True
+    else:
+        if pk in request.session.get('liked_posts', []):
+            is_liked = True
+
     return render(request, 'blog/post_detail.html', {
         'post': post,
         'comments': comments,
         'new_comment': new_comment,
-        'comment_form': comment_form
+        'comment_form': comment_form,
+        'is_liked': is_liked
     })
 
 @require_POST
@@ -85,12 +101,23 @@ def delete_comment(request, post_pk, pk):
         comment.delete()
     return redirect('blog:post_detail', pk=post_pk)
 
-@login_required
 @require_POST
 def like_post(request, pk):
     post = get_object_or_404(Post, id=pk)
-    if request.user in post.likes.all():
-        post.likes.remove(request.user)
+    if request.user.is_authenticated:
+        if request.user in post.likes.all():
+            post.likes.remove(request.user)
+        else:
+            post.likes.add(request.user)
     else:
-        post.likes.add(request.user)
+        liked_posts = request.session.get('liked_posts', [])
+        if pk in liked_posts:
+            liked_posts.remove(pk)
+            if post.anonymous_likes > 0:
+                post.anonymous_likes -= 1
+        else:
+            liked_posts.append(pk)
+            post.anonymous_likes += 1
+        request.session['liked_posts'] = liked_posts
+        post.save()
     return redirect(post.get_absolute_url())

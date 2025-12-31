@@ -25,6 +25,7 @@ class Post(models.Model):
     categories = models.ManyToManyField(Category, related_name="posts")
     tags = models.ManyToManyField(Tag, related_name='posts', blank=True)
     likes = models.ManyToManyField(User, related_name='liked_posts', blank=True)
+    anonymous_likes = models.IntegerField(default=0)
 
     def __str__(self):
         return self.title
@@ -34,7 +35,7 @@ class Post(models.Model):
 
     @property
     def total_likes(self):
-        return self.likes.count()
+        return self.likes.count() + self.anonymous_likes
 
 class Comment(models.Model):
     """A comment on a blog post."""
