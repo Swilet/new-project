@@ -54,7 +54,6 @@ def tag_detail(request, tag_name):
     })
 
 
-@login_required
 def post_detail(request, pk):
     post = get_object_or_404(Post.objects.prefetch_related('categories', 'tags', 'comments'), pk=pk)
     comments = post.comments.filter(active=True)
