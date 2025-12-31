@@ -1,5 +1,6 @@
 from .models import Category, Tag
 from django.core.cache import cache
+from django.db.models import Q
 
 def all_categories(request):
     all_categories = cache.get('all_categories')
@@ -13,7 +14,11 @@ def all_categories(request):
 def all_tags(request):
     all_tags = cache.get('all_tags')
     if not all_tags:
-        all_tags = Tag.objects.all()
+        # Get tags that are associated with at least one post or travel
+        all_tags = Tag.objects.filter(
+            Q(posts__isnull=False) | Q(travels__isnull=False)
+        ).distinct()
+        
         cache.set('all_tags', all_tags, 900)  # Cache for 15 minutes
     return {
         'all_tags': all_tags

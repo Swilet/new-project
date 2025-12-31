@@ -8,10 +8,16 @@ class TravelListView(ListView):
     context_object_name = 'travels'
     ordering = ['-created_at']
 
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related('tags')
+
 travel_list = TravelListView.as_view()
 
 class TravelDetailView(DetailView):
     model = Travel
     template_name = 'travel/travel_detail.html'
+
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related('tags')
 
 travel_detail = TravelDetailView.as_view()

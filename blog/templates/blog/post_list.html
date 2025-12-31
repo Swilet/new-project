@@ -26,13 +26,6 @@
         카테고리: <strong>{{ category.name }}</strong> ({{ posts.paginator.count }}개)
       </h5>
     </div>
-  {% elif tag %}
-    <div class="nm-card mb-4">
-      <h5 class="mb-0">
-        <i class="bi bi-tag"></i>
-        태그: <strong>{{ tag.name }}</strong> ({{ posts.paginator.count }}개)
-      </h5>
-    </div>
   {% else %}
     <div class="nm-card mb-4">
       <h5 class="mb-0">
@@ -66,8 +59,6 @@
           <p class="mb-0">'{{ search_query }}'에 대한 검색 결과가 없습니다.</p>
         {% elif category %}
             <p class="mb-0">'{{ category.name }}' 카테고리에 아직 글이 없습니다.</p>
-        {% elif tag %}
-            <p class="mb-0">'{{ tag.name }}' 태그에 아직 글이 없습니다.</p>
         {% else %}
           <p class="mb-0">아직 작성된 글이 없습니다.</p>
         {% endif %}
@@ -79,7 +70,7 @@
       <ul class="pagination nm-card p-2 rounded-pill">
         {% if posts.has_previous %}
           <li class="page-item">
-            <a class="page-link" href="?page={{ posts.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if category %}&category={{ category.name }}{% endif %}{% if tag %}&tag={{ tag.name }}{% endif %}">&laquo;</a>
+            <a class="page-link" href="?page={{ posts.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if category %}&category={{ category.name }}{% endif %}">&laquo;</a>
           </li>
         {% else %}
           <li class="page-item disabled">
@@ -95,7 +86,7 @@
 
         {% if posts.has_next %}
           <li class="page-item">
-            <a class="page-link" href="?page={{ posts.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if category %}&category={{ category.name }}{% endif %}{% if tag %}&tag={{ tag.name }}{% endif %}">&raquo;</a>
+            <a class="page-link" href="?page={{ posts.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if category %}&category={{ category.name }}{% endif %}">&raquo;</a>
           </li>
         {% else %}
           <li class="page-item disabled">
@@ -104,5 +95,33 @@
         {% endif %}
       </ul>
     </nav>
+  {% endif %}
+
+  {% if not search_query and not category and not tag and travels %}
+    <div class="nm-card mb-4 mt-5">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h5 class="mb-1"><i class="bi bi-airplane"></i> 최근 여행</h5>
+          <p class="mb-0 text-secondary small">
+            최근에 다녀온 여행 기록입니다.
+          </p>
+        </div>
+        <a href="{% url 'travel:travel_list' %}" class="btn btn-sm btn-outline-primary">
+            전체 보기
+        </a>
+      </div>
+    </div>
+
+    <div class="row">
+      {% for travel in travels|slice:":3" %}
+        <div class="col-md-4 mb-4">
+          <div class="nm-card h-100 position-relative">
+            <h5 class="card-title">{{ travel.name }}</h5>
+            <p class="card-text small text-secondary">{{ travel.description|truncatewords_html:15|safe }}</p>
+            <a href="{% url 'travel:travel_detail' travel.pk %}" class="stretched-link"></a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
   {% endif %}
 {% endblock %}

@@ -1,24 +1,20 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q
 from .models import Post, Category, Comment, Tag
+from travel.models import Travel
 from .forms import CommentForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 
-def post_list(request, category_name=None, tag_name=None):
+def post_list(request, category_name=None):
     search_query = request.GET.get('q', '')
     category = None
-    tag = None
     post_list = Post.objects.all()
 
     if category_name:
         category = get_object_or_404(Category, name=category_name)
         post_list = post_list.filter(categories=category)
-    
-    if tag_name:
-        tag = get_object_or_404(Tag, name=tag_name)
-        post_list = post_list.filter(tags=tag)
     
     if search_query:
         post_list = post_list.filter(
@@ -36,13 +32,27 @@ def post_list(request, category_name=None, tag_name=None):
     except EmptyPage:
         posts = paginator.page(paginator.num_pages)
 
+    travels = Travel.objects.all().order_by('-created_at')
+
     return render(request, "blog/post_list.html", {
         "posts": posts,
         "page": page,
         "category": category,
-        "tag": tag,
         "search_query": search_query,
+        "travels": travels,
     })
+
+def tag_detail(request, tag_name):
+    tag = get_object_or_404(Tag, name=tag_name)
+    posts = Post.objects.filter(tags=tag).prefetch_related('categories', 'tags').order_by("-created_at")
+    travels = Travel.objects.filter(tags=tag).prefetch_related('tags').order_by('-created_at')
+
+    return render(request, 'blog/tag_detail.html', {
+        'tag': tag,
+        'posts': posts,
+        'travels': travels,
+    })
+
 
 @login_required
 def post_detail(request, pk):

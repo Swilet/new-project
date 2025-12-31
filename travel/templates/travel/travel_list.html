@@ -20,12 +20,18 @@
   <div class="row">
     {% for travel in travels %}
       <div class="col-md-4 mb-4">
-        <a href="{% url 'travel:travel_detail' travel.pk %}" class="text-decoration-none text-dark">
-          <div class="card-body">
-              <h5 class="card-title">{{ travel.name }}</h5>
-              <p class="card-text">{{ travel.description|truncatewords_html:20|safe }}</p>
+        <div class="nm-card h-100 position-relative">
+            <h5 class="card-title">{{ travel.name }}</h5>
+            <p class="card-text small text-secondary">{{ travel.description|truncatewords_html:15|safe }}</p>
+            <div class="mt-auto pt-3">
+              <div class="d-flex flex-wrap gap-1">
+              {% for tag in travel.tags.all %}
+                <a href="{% url 'blog:posts_by_tag' tag.name %}" class="badge text-bg-primary text-decoration-none position-relative" style="z-index: 1;">{{ tag.name }}</a>
+              {% endfor %}
+              </div>
             </div>
-        </a>
+            <a href="{% url 'travel:travel_detail' travel.pk %}" class="stretched-link"></a>
+        </div>
       </div>
     {% empty %}
       <div class="col">
